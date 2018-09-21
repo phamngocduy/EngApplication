@@ -1,0 +1,78 @@
+﻿@using System.Text.RegularExpressions
+@model IEnumerable<String>
+@{
+    ViewBag.Title = "Practicing";
+}
+
+<hr />
+<div class="well">
+    <div class="container">
+    @foreach (var text in Model)
+    {
+        if (String.IsNullOrEmpty(text))
+        {
+            <br /><br />
+        }
+        else
+        {
+            <span class="line">
+            @MvcHtmlString.Create("<!--")
+            @foreach (var word in Regex.Split(text, "([a-zA-Z]+)"))
+            {
+                @MvcHtmlString.Create("-->")<span class="@(Regex.IsMatch(word, "[a-zA-Z]+") ? "word" : word.Contains('.') ? "dot" : null)">@word</span>@MvcHtmlString.Create("<!--")
+            }
+            @MvcHtmlString.Create("-->")
+            </span>
+        }
+    }
+    </div>
+</div>
+
+<style>
+    span.line:hover {
+        text-decoration: underline;
+    }
+    span.bold {
+        font-weight: bold;
+    }
+    span.underline {
+        text-decoration: underline;
+    }
+    span.word {
+        cursor: pointer;
+    }
+    span.red {
+        color: Red;
+    }
+    span.green {
+        color: Green;
+    }
+</style>
+
+@section Scripts {
+<script>
+    $(function () {
+        $('span.word').click(function () {
+            $('span.bold').removeClass('bold').parent('span.line').removeClass('underline');
+            $(this).addClass('bold').parent('span.line').addClass('underline');
+            setContent($(this).parent('span.line').nextAll('span.line').andSelf());
+            ABC = this;
+        });
+        setContent($('span.line'));
+    });
+
+    Content = [];
+    function setContent(sentences) {
+        Content = [];
+        sentences.each(function () {
+            var sentence = [];
+            $(this).find('span.word').each(function () {
+                sentence.push($(this).text().toLowerCase());
+            });
+            Content.push(sentence);
+        })
+    }
+
+    // start coding here
+</script>
+}
