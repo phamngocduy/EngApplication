@@ -1,0 +1,26 @@
+#play{
+    width: 52px;
+    height: 52px;
+  }
+  button {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+  }
+  #resumeButton{
+    display: none;
+  }
+  #cancelButton{
+    display: none;
+  }
+  #play1{
+    width: 52px;
+    height: 52px;
+  }
+
+
+  
+  
