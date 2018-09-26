@@ -20,6 +20,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -173,10 +174,21 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Button-Fast-Forward-icon.png" />
     <Content Include="Content\logo-vlu-6.png" />
     <Content Include="Content\mic-animate.gif" />
     <Content Include="Content\mic-slash.gif" />
     <Content Include="Content\mic.gif" />
+    <Content Include="Content\Network-Download-icon.png" />
+    <Content Include="Content\Pause-icon.png" />
+    <Content Include="Content\Play-icon.png" />
+    <Content Include="Content\Speak-2-icon.png" />
+    <Content Include="Content\Stop-icon.png" />
+    <Content Include="Views\Home\Speak-2-icon.png" />
+    <Content Include="Views\Home\Stop-icon.png" />
+    <Content Include="Content\style.css" />
+    <Content Include="Content\uk.png" />
+    <Content Include="Content\us-01.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -193,6 +205,9 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\p5.js" />
+    <Content Include="Scripts\p5.min.js" />
+    <Content Include="Scripts\p5.sound.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
