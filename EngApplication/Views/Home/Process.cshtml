@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Practicing";
 }
+
 <link rel="stylesheet" type="text/css" href="~/Content/style.css" />
 <hr />
 
@@ -23,7 +24,8 @@
     </div>
     <div class="form-inline col-sm-3">
         <button id="recordButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" onclick="mousePressed1()"><img id="play" src="~/Content/Button-Fast-Forward-icon.png"></button>
-        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
+        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to replay recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
+        <button id="replayButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Speak-2-icon.png"></button>
         <button id="downloadButton" class="btn" title="Downloading" data-toggle="popover" data-trigger="hover" data-content="Click hear to downloading" onclick="mousePressed3()"><img id="play" src="~/Content/Network-Download-icon.png"></button>
 
     </div>
@@ -49,37 +51,61 @@
                 </span>
             }
         }
-    </div>
-</div>
 
-<style>
-    span.line:hover {
-        text-decoration: underline;
-    }
 
-    span.bold {
-        font-weight: bold;
-    }
+        <hr />
 
-    span.underline {
-        text-decoration: underline;
-    }
 
-    span.word {
-        cursor: pointer;
-    }
+        <style>
+            span.line:hover {
+                text-decoration: underline;
+            }
 
-    span.red {
-        color: Red;
-    }
 
-    span.green {
-        color: Green;
-    }
-</style>
+            span.bold {
+                font-weight: bold;
+            }
 
-@section Scripts {
-    <script>
+            span.underline {
+                text-decoration: underline;
+            }
+
+            span.word {
+                cursor: pointer;
+            }
+
+            span.red {
+                color: Red;
+            }
+
+
+            span.bold {
+                font-weight: bold;
+            }
+
+            span.underline {
+                text-decoration: underline;
+            }
+
+            span.word {
+                cursor: pointer;
+            }
+
+            span.red {
+                color: Red;
+            }
+
+            span.green {
+                color: Green;
+            }
+        </style>
+
+        @section Scripts {
+
+            <script>
+
+
+
     $(function () {
         $('span.word').click(function () {
             $('span.bold').removeClass('bold').parent('span.line').removeClass('underline');
@@ -101,6 +127,7 @@
             Content.push(sentence);
         })
     }
+
 
             // start coding here
     var synth = window.speechSynthesis;
@@ -209,20 +236,19 @@
         }
 
     });
+    //var reading= $('span.line').text();
             //////////////-Reading-Here////////////////////////
     $("#playButton").click(function (event) {
         if (isBegin == true) {
             event.preventDefault();
             //Read each text in array Content
-            for (let i = 0; i < Content.length; i++) {
-                for (let j = 0; j < Content[i].length; j++) {
-                    speak(Content[i][j]);
-                    $("#resumeButton").show();
-                    $("#cancelButton").show();
-                    $("#playButton").hide();
-                }
+            for (var i = 0; i < Content.length; i++) {
+                speak(Content[i]);
+
             }
-           
+            $("#resumeButton").show();
+            $("#cancelButton").show();
+            $("#playButton").hide();
             isBegin = false;
         }
 
@@ -243,12 +269,12 @@
 
         if (state === 0 && mic.enabled) {
             recorder.record(soundFile);
-            $("#play1").attr('src', "\Stop-icon.png");
+            $('#recordingStopButton').show();
+            $('#replayButton').hide();
             state++;
         }
         if (isOnclick == true) {
-            $("#recordingStopButton").attr('data-content', 'Click here to stop recording!');
-            $("#recordButton").attr('data-content', 'Recording!');
+          
             isOnclick = false;
         }
     }
@@ -257,15 +283,16 @@
         if (state === 1) {
             recorder.stop(); // stop recorder, and send the result to soundFile
             state++;
-            $("#recordingStopButton").attr('data-content', 'Click here to hear your voice!');
-            $("#play1").attr('src', "\Speak-2-icon.png");
+            $('#recordingStopButton').hide();
+            $('#replayButton').show();
+            
 
         } else if (state === 2) {
             soundFile.play(); // play the result
 
 
         }
-        $("#recordButton").attr('data-content', 'Click here to begin record');
+       
 
 
     }
@@ -276,8 +303,15 @@
             $("#recordButton").attr('data-content', 'Click here to begin recording');
         }
     }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
-}
+    $(document).ready(function () {
+        $("#replayButton").hide();
+    });
+            </script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
+        }
+
+
+        </script>
+
 
