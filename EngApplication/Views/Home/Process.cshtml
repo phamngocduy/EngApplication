@@ -103,19 +103,22 @@
     }
 
     // start coding here
-    var synth = window.speechSynthesis;
+    var synth = window.speechSynthesis;                                         //get speechSynthesis library from google
     var inputForm = document.querySelector('form');
     var voiceSelect = document.querySelector('select');
     var mic, recorder, soundFile;
-    var state = 0; // mousePress will increment from Record, to Stop, to Play
+    var state = 0;                                                              // mousePress will increment from Record, to Stop, to Play
     var rate = document.querySelector('#rate');
     var rateValue = document.querySelector('.rate-value');
-    var listVoice = ["David", "Zira", "Mark", "Chelsea", "Peter", "Sergio"];
+    var listVoice = ["David", "Zira", "Mark", "Chelsea", "Peter", "Sergio"];    //array name for google voices
     var voices = [];
-    var isClick = true;
-    var count = 1;
-    var isBegin = true;
-    //Get voices
+    var isClick = true;                                                         //boolean for handle reading text
+    var count = 1;                                                              //count for handle recording
+    var isBegin = true;                                                         //set state for begin in reading
+    var countEnd= 0;                                                            //count for handle record to auto end
+    /* 
+    Get voices from google 
+    */
     function populateVoiceList() {
         voices = synth.getVoices();
         var selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
@@ -151,17 +154,33 @@
     if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = populateVoiceList;
     }
-
-   //Handle read here
-    function speak(speakingHere) {
-        if (speakingHere !== '') {
-            var utterThis = new SpeechSynthesisUtterance(speakingHere);
+   
+    /*
+     Handle function to read Text
+     */
+    var isEnded = 0;
+    function speak() {  
+        if ($(spanContent[isEnded]).text() !== '') {
+            var utterThis = new SpeechSynthesisUtterance($(spanContent[isEnded]).text());
+            currentPosition = true;
             utterThis.onend = function (event) {
+                currentPosition = false;
                 console.log('SpeechSynthesisUtterance.onend');
-                $("#resumeButton").hide();
-                $("#cancelButton").hide();
-                $("#playButton").show();
-                isBegin = true;
+                countEnd++;
+                if (countEnd == spanContent.length) {
+                    $("#resumeButton").hide();
+                    $("#cancelButton").hide();
+                    $("#playButton").show();
+                    countEnd = 0;
+                    isBegin = true;
+                }
+                if (isEnded < spanContent.length) {
+                    $(spanContent[isEnded+1]).addClass('blue');
+                    isEnded++;
+                    speak();               
+                }
+               
+                   
             }
             utterThis.onerror = function (event) {
                 console.error('SpeechSynthesisUtterance.onerror');
@@ -179,12 +198,15 @@
             synth.speak(utterThis);
         }
     }
-    //Change speed value read
+   
     rate.onchange = function () {
-        rateValue.textContent = rate.value;
+        rateValue.textContent = rate.value;  //Change speed value read
     }
-    //
-    $("#resumeButton").click(function () {
+
+    /* 
+    Handle resume, cancel,play to read
+    */
+    $("#resumeButton").click(function () {//handle resume button
         if (isClick == true) {
             synth.pause();
             isClick = false;
@@ -193,7 +215,7 @@
             isClick = true;
         }
     });
-    $("#cancelButton").click(function () {
+    $("#cancelButton").click(function () {//handle cancel button
         if (isBegin == false) {
             synth.cancel();
             $("#resumeButton").hide();
@@ -202,37 +224,33 @@
             isBegin = true;
         }
     });
-    //var reading= $('span.line').text();
-    //////////////-Reading-Here////////////////////////
-    $("#playButton").click(function (event) {
+    $("#playButton").click(function () {//handle play button
         $('.line').removeClass('blue')
-        if (isBegin == true) {
-            event.preventDefault();
-            //Read each text in array Content
-            for (let i = 0; i < spanContent.length; i++) {
-                $(spanContent[i]).addClass('blue');
-                speak($(spanContent[i]).text()); /// read a sentence
-                    $("#resumeButton").show();
-                    $("#cancelButton").show();
-                    $("#playButton").hide();
-            }
-            isBegin = false;
+        if (isEnded == spanContent.length) {
+            isEnded = 0;
         }
+        if (isBegin == true) {
+            
+            $("#resumeButton").show();
+            $("#cancelButton").show();
+            $("#playButton").hide();
+            $(spanContent[0]).addClass('blue');
+            speak();
+        }
+        isBegin = false;
     });
-    //Setup mic onload
-    function setup() {
+    isOnclick = false; //to set run play 
+    function setup() { //Setup mic onload
         mic = new p5.AudioIn();
         mic.start();
         recorder = new p5.SoundRecorder();
         recorder.setInput(mic);
         soundFile = new p5.SoundFile();
-    }
-    isOnclick = false;
+    }    
     function mousePressed1() {
         isOnclick = true;
         state = 0;
-
-        if (state === 0 && mic.enabled) {
+        if (state === 0 && mic.enabled) {//set state to hide or show and state
             recorder.record(soundFile);
             $('#recordingStopButton').show();
             $('#replayButton').hide();
@@ -242,8 +260,7 @@
             isOnclick = false;
         }
     }
-    //Stop record and play again
-    function mousePressed2() {
+    function mousePressed2() {//Stop record and play again
         if (state === 1) {
             recorder.stop(); // stop recorder, and send the result to soundFile
             state++;
@@ -252,19 +269,25 @@
         } else if (state === 2) {
             soundFile.play(); // play the result
         }
-    }
-    //Download here
-    function mousePressed3() {
+    } 
+    function mousePressed3() {//Download here
         if (state === 2) {
             saveSound(soundFile, 'mySound.wav'); // save file
             $("#recordButton").attr('data-content', 'Click here to begin recording');
         }
     }
+
+
+    /*
+    Run when load
+    */
     $(document).ready(function () {
         $("#replayButton").hide();
         $('#rate').slider({
         });
+       
     });
+    
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
