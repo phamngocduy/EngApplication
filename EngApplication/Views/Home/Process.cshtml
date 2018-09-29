@@ -32,20 +32,20 @@
 <div class="well">
     <div class="container">
         @foreach (var text in Model)
+        {
+            if (String.IsNullOrEmpty(text))
             {
-                if (String.IsNullOrEmpty(text))
-                {
                 <br /><br />
             }
             else
             {
                 <span class="line">
-                    @MvcHtmlString.Create("<!--")
-                    @foreach (var word in Regex.Split(text, "([a-zA-Z]+)"))
-                    {
-                        @MvcHtmlString.Create("-->")<span class="@(Regex.IsMatch(word, "[a-zA-Z]+") ? "word" : word.Contains('.') ? "dot" : null)">@word</span>@MvcHtmlString.Create("<!--")
-                    }
-                    @MvcHtmlString.Create("-->")
+                @MvcHtmlString.Create("<!--")
+                @foreach (var word in Regex.Split(text, "([a-zA-Z]+)"))
+                {
+                    @MvcHtmlString.Create("-->")<span class="@(Regex.IsMatch(word, "[a-zA-Z]+") ? "word" : word.Contains('.') ? "dot" : null)">@word</span>@MvcHtmlString.Create("<!--")
+                }
+                @MvcHtmlString.Create("-->")
                 </span>
             }
         }
@@ -56,25 +56,23 @@
     span.line:hover {
         text-decoration: underline;
     }
-
     span.bold {
         font-weight: bold;
     }
-
     span.underline {
         text-decoration: underline;
     }
-
     span.word {
         cursor: pointer;
     }
-
     span.red {
-        color: Red;
+        color: red;
     }
-
     span.green {
-        color: Green;
+        color: green;
+    }
+    span.blue {
+        color: blue;
     }
 </style>
 
@@ -85,24 +83,26 @@
             $('span.bold').removeClass('bold').parent('span.line').removeClass('underline');
             $(this).addClass('bold').parent('span.line').addClass('underline');
             setContent($(this).parent('span.line').nextAll('span.line').andSelf());
-            ABC = this;
         });
         setContent($('span.line'));
     });
 
-    Content = [];
+    spanContent = [];
+    textContent = [];
     function setContent(sentences) {
-        Content = [];
+        spanContent = [];
+        textContent = [];
         sentences.each(function () {
             var sentence = [];
             $(this).find('span.word').each(function () {
                 sentence.push($(this).text().toLowerCase());
             });
-            Content.push(sentence);
+            spanContent.push(this);
+            textContent.push(sentence);
         })
     }
 
-            // start coding here
+    // start coding here
     var synth = window.speechSynthesis;
     var inputForm = document.querySelector('form');
     var voiceSelect = document.querySelector('select');
@@ -115,7 +115,7 @@
     var isClick = true;
     var count = 1;
     var isBegin = true;
-        //Get voices
+    //Get voices
     function populateVoiceList() {
         voices = synth.getVoices();
         var selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
@@ -134,7 +134,6 @@
                 j++;
                 isLang = true;
             }
-
             if (voices[i].default) {
                 option.innerHTML += '';
             }
@@ -144,7 +143,6 @@
                 option.value = j;
                 voiceSelect.appendChild(option);
             }
-
         }
         voiceSelect.selectedIndex = selectedIndex;
     }
@@ -154,7 +152,7 @@
         speechSynthesis.onvoiceschanged = populateVoiceList;
     }
 
-   //Handle read here
+    //Handle read here
     function speak(speakingHere) {
         if (speakingHere !== '') {
             var utterThis = new SpeechSynthesisUtterance(speakingHere);
@@ -185,11 +183,8 @@
     rate.onchange = function () {
         rateValue.textContent = rate.value;
     }
-
-
     //
     $("#resumeButton").click(function () {
-
         if (isClick == true) {
             synth.pause();
             isClick = false;
@@ -197,7 +192,6 @@
             synth.resume();
             isClick = true;
         }
-
     });
     $("#cancelButton").click(function () {
         if (isBegin == false) {
@@ -207,27 +201,24 @@
             $("#playButton").show();
             isBegin = true;
         }
-
     });
-            //////////////-Reading-Here////////////////////////
+    //////////////-Reading-Here////////////////////////
     $("#playButton").click(function (event) {
+        $('.line').removeClass('blue')
         if (isBegin == true) {
             event.preventDefault();
             //Read each text in array Content
-            for (let i = 0; i < Content.length; i++) {
-                for (let j = 0; j < Content[i].length; j++) {
-                    speak(Content[i][j]);
-                    $("#resumeButton").show();
-                    $("#cancelButton").show();
-                    $("#playButton").hide();
-                }
+            for (let i = 0; i < spanContent.length; i++) {
+                $(spanContent[i]).addClass('blue');
+                speak($(spanContent[i]).text()); /// read a sentence
+                $("#resumeButton").show();
+                $("#cancelButton").show();
+                $("#playButton").hide();
             }
-           
             isBegin = false;
         }
-
     });
-        //Setup mic onload
+    //Setup mic onload
     function setup() {
         mic = new p5.AudioIn();
         mic.start();
@@ -235,7 +226,6 @@
         recorder.setInput(mic);
         soundFile = new p5.SoundFile();
     }
-
     isOnclick = false;
     function mousePressed1() {
         isOnclick = true;
@@ -262,14 +252,10 @@
 
         } else if (state === 2) {
             soundFile.play(); // play the result
-
-
         }
         $("#recordButton").attr('data-content', 'Click here to begin record');
-
-
     }
-        //Download here
+    //Download here
     function mousePressed3() {
         if (state === 2) {
             saveSound(soundFile, 'mySound.wav'); // save file
