@@ -18,9 +18,10 @@
     </div>
 
     <div class="col-sm-3 form-inline">
-        <button id="playButton" class="btn"><img id="play" src="~/Content/Play-icon.png" /></button>
-        <button id="resumeButton" class="btn"><img id="play" src="~/Content/Pause-icon.png"></button>
-        <button id="cancelButton" class="btn"><img id="play" src="~/Content/Stop-icon.png"></button>
+        <button id="playButton" class="btn" title="Play" data-toggle="popover" data-trigger="hover" data-content="Click hear to play"><img id="play" src="~/Content/Play-icon.png" /></button>
+        <button id="playResumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume"><img id="play" src="~/Content/Play-icon.png" /></button>
+        <button id="resumeButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause"><img id="play" src="~/Content/Pause-icon.png"></button>
+        <button id="cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop"><img id="play" src="~/Content/Stop-icon.png"></button>
     </div>
     <div class="form-inline col-sm-3">
         <button id="recordButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" onclick="mousePressed1()"><img id="play" src="~/Content/Button-Fast-Forward-icon.png"></button>
@@ -89,17 +90,21 @@
 
     spanContent = [];
     textContent = [];
+
     function setContent(sentences) {
         spanContent = [];
         textContent = [];
+        tempContent = [];
         sentences.each(function () {
             var sentence = [];
             $(this).find('span.word').each(function () {
                 sentence.push($(this).text().toLowerCase());
             });
             spanContent.push(this);
+
             textContent.push(sentence);
         })
+
     }
 
     // start coding here
@@ -116,8 +121,8 @@
     var count = 1;                                                              //count for handle recording
     var isBegin = true;                                                         //set state for begin in reading
     var countEnd= 0;                                                            //count for handle record to auto end
-    /* 
-    Get voices from google 
+    /*
+    Get voices from google
     */
     function populateVoiceList() {
         voices = synth.getVoices();
@@ -154,33 +159,37 @@
     if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = populateVoiceList;
     }
-   
+
     /*
      Handle function to read Text
      */
     var isEnded = 0;
-    function speak() {  
-        if ($(spanContent[isEnded]).text() !== '') {
-            var utterThis = new SpeechSynthesisUtterance($(spanContent[isEnded]).text());
-            currentPosition = true;
+
+    function speak(readingText) {
+            isBegin = false;
+            var utterThis = new SpeechSynthesisUtterance(readingText);
             utterThis.onend = function (event) {
-                currentPosition = false;
                 console.log('SpeechSynthesisUtterance.onend');
                 countEnd++;
-                if (countEnd == spanContent.length) {
+
+                if (spanContent.length == 0) {   // check the last line
                     $("#resumeButton").hide();
                     $("#cancelButton").hide();
+                    $("#playResumeButton").hide();
                     $("#playButton").show();
                     countEnd = 0;
                     isBegin = true;
+                    $('.line').removeClass('blue');
                 }
-                if (isEnded < spanContent.length) {
-                    $(spanContent[isEnded+1]).addClass('blue');
-                    isEnded++;
-                    speak();               
+                if (isBegin == false) {
+                    $("#resumeButton").show();
+                    $("#cancelButton").show();
+                    $("#playResumeButton").hide();
+                    $("#playButton").hide();
                 }
-               
-                   
+                if (spanContent.length > 0) {
+                    hamdoc();
+                }
             }
             utterThis.onerror = function (event) {
                 console.error('SpeechSynthesisUtterance.onerror');
@@ -195,58 +204,86 @@
                 }
             }
             utterThis.rate = rate.value;
+            synth.cancel();
             synth.speak(utterThis);
-        }
+            var r = setInterval(function () {
+                if (spanContent.length > 0) {
+                    console.log(synth.speaking);
+                    if (!synth.speaking){
+                        clearInterval(r);
+                        hamdoc();
+                    }
+                    else synth.resume();
+                }}, 14000);
     }
-   
+
     rate.onchange = function () {
         rateValue.textContent = rate.value;  //Change speed value read
     }
 
-    /* 
+    /*
     Handle resume, cancel,play to read
     */
-    $("#resumeButton").click(function () {//handle resume button
+    $("#resumeButton").click(function () {//handle pause button
         if (isClick == true) {
             synth.pause();
             isClick = false;
-        } else {
+            $("#resumeButton").hide();
+            $("#playResumeButton").show();
+        }
+    });
+
+    $("#playResumeButton").click(function () {//handle resume button
+        if (isClick == false) {
             synth.resume();
             isClick = true;
+            $("#resumeButton").show();
+            $("#playResumeButton").hide();
         }
     });
     $("#cancelButton").click(function () {//handle cancel button
         if (isBegin == false) {
             synth.cancel();
+            location.reload();
             $("#resumeButton").hide();
             $("#cancelButton").hide();
+            $("#playResumeButton").hide();
             $("#playButton").show();
             isBegin = true;
         }
     });
     $("#playButton").click(function () {//handle play button
-        $('.line').removeClass('blue')
+
         if (isEnded == spanContent.length) {
             isEnded = 0;
         }
         if (isBegin == true) {
-            
             $("#resumeButton").show();
             $("#cancelButton").show();
+            $("#playResumeButton").hide();
             $("#playButton").hide();
-            $(spanContent[0]).addClass('blue');
-            speak();
+            hamdoc();
         }
         isBegin = false;
     });
-    isOnclick = false; //to set run play 
+    function hamdoc() {
+        $('.line').removeClass('blue');
+        $(spanContent[0]).addClass('blue');
+        speak($(spanContent[0]).text());
+        spanContent.reverse();
+        spanContent.pop();
+        spanContent.reverse();
+
+    }
+
+    isOnclick = false; //to set run play
     function setup() { //Setup mic onload
         mic = new p5.AudioIn();
         mic.start();
         recorder = new p5.SoundRecorder();
         recorder.setInput(mic);
         soundFile = new p5.SoundFile();
-    }    
+    }
     function mousePressed1() {
         isOnclick = true;
         state = 0;
@@ -269,7 +306,7 @@
         } else if (state === 2) {
             soundFile.play(); // play the result
         }
-    } 
+    }
     function mousePressed3() {//Download here
         if (state === 2) {
             saveSound(soundFile, 'mySound.wav'); // save file
@@ -282,12 +319,14 @@
     Run when load
     */
     $(document).ready(function () {
+
+        $("#playResumeButton").hide();
         $("#replayButton").hide();
         $('#rate').slider({
         });
-       
+
     });
-    
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>

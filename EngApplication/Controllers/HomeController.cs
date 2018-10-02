@@ -36,7 +36,7 @@ namespace EngApplication.Controllers
             return View("Process", split(text).Split('\n'));
         }
 
-        readonly float MAX = 200;
+        readonly float MAX = 500;
         public String split(string text = "")
         {
             var texts = new List<String>();
