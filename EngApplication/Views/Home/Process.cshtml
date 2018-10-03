@@ -167,7 +167,7 @@
 
     function speak(readingText) {
             isBegin = false;
-            var utterThis = new SpeechSynthesisUtterance(readingText);
+            utterThis = new SpeechSynthesisUtterance(readingText);
             utterThis.onend = function (event) {
                 console.log('SpeechSynthesisUtterance.onend');
                 countEnd++;
@@ -206,6 +206,7 @@
             utterThis.rate = rate.value;
             synth.cancel();
             synth.speak(utterThis);
+            /*
             var r = setInterval(function () {
                 if (spanContent.length > 0) {
                     console.log(synth.speaking);
@@ -214,7 +215,7 @@
                         hamdoc();
                     }
                     else synth.resume();
-                }}, 14000);
+                }}, 14000);*/
     }
 
     rate.onchange = function () {

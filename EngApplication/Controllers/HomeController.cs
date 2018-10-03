@@ -91,5 +91,10 @@ namespace EngApplication.Controllers
             }
             return String.Join("\n", texts);
         }
+
+        public string Lookup(string word)
+        {
+            return "";
+        }
     }
 }
