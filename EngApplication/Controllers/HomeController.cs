@@ -55,7 +55,18 @@ namespace EngApplication.Controllers
                     else if (String.IsNullOrWhiteSpace(sentences[i]))
                         sentences.RemoveAt(i);
                 foreach (var sentence in sentences)
-                    if (sentence.Length <= MAX)
+                    if (sentence.Length <= 2)
+                    {
+                        if (texts.Count > 0)
+                        {
+                            if (texts.Last().Length + sentence.Length <= MAX)
+                            {
+                                texts.Add(texts.Last() + sentence);
+                                texts.RemoveAt(texts.Count - 2);
+                            }
+                        }
+                    }
+                    else if (sentence.Length <= MAX)
                         texts.Add(sentence);
                     else
                     {

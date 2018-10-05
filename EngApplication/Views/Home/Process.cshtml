@@ -10,18 +10,14 @@
 <div class="row">
     <div class="col-sm-3 form-inline">
         <select class="form-control" id="voices"></select>
-    </div>
-    <div class="form-inline col-sm-3">
-        <label for="rate">Rate</label><input type="range" data-slider-min="0.5" data-slider-max="2" data-slider-value="1" data-slider-step="0.1" id="rate">
-        <div class="rate-value">1</div>
-        <div class="clearfix"></div>
+        <input type="range" data-slider-min="0.5" data-slider-max="2" data-slider-value="1" data-slider-step="0.1" id="rate">
     </div>
 
     <div class="col-sm-3 form-inline">
         <button id="playButton" class="btn" title="Play" data-toggle="popover" data-trigger="hover" data-content="Click hear to play"><img id="play" src="~/Content/Play-icon.png" /></button>
-        <button id="playResumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume"><img id="play" src="~/Content/Play-icon.png" /></button>
-        <button id="resumeButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause"><img id="play" src="~/Content/Pause-icon.png"></button>
-        <button id="cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop"><img id="play" src="~/Content/Stop-icon.png"></button>
+        <button id="resumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume" style="display:none"><img id="play" src="~/Content/Play-icon.png" /></button>
+        <button id="pauseButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause" style="display:none"><img id="play" src="~/Content/Pause-icon.png"></button>
+        <button id="cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop" style="display:none"><img id="play" src="~/Content/Stop-icon.png"></button>
     </div>
     <div class="form-inline col-sm-3">
         <button id="recordButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" onclick="mousePressed1()"><img id="play" src="~/Content/Button-Fast-Forward-icon.png"></button>
@@ -52,7 +48,8 @@
                 </span>
             }
         }
-        <hr />
+    </div>
+</div>
 <style>
     span.line:hover {
         text-decoration: underline;
@@ -101,20 +98,17 @@
                 sentence.push($(this).text().toLowerCase());
             });
             spanContent.push(this);
-
             textContent.push(sentence);
         })
-
     }
 
     // start coding here
-    var synth = window.speechSynthesis;                                         //get speechSynthesis library from google
-    var inputForm = document.querySelector('form');
+    //get speechSynthesis library from google
+    var synth = window.speechSynthesis;
     var voiceSelect = document.querySelector('select');
     var mic, recorder, soundFile;
-    var state = 0;                                                              // mousePress will increment from Record, to Stop, to Play
+    var state = 0; // mousePress will increment from Record, to Stop, to Play
     var rate = document.querySelector('#rate');
-    var rateValue = document.querySelector('.rate-value');
     var listVoice = ["David", "Zira", "Mark", "Chelsea", "Peter", "Sergio"];    //array name for google voices
     var voices = [];
     var isClick = true;                                                         //boolean for handle reading text
@@ -138,7 +132,6 @@
                 } else {
                     option.innerHTML = listVoice[j] + ' (' + voices[i].lang + ')';
                 }
-
                 j++;
                 isLang = true;
             }
@@ -163,118 +156,89 @@
     /*
      Handle function to read Text
      */
-    var isEnded = 0;
-
+    var isSpeaking = false;
     function speak(readingText) {
-            isBegin = false;
-            utterThis = new SpeechSynthesisUtterance(readingText);
-            utterThis.onend = function (event) {
-                console.log('SpeechSynthesisUtterance.onend');
-                countEnd++;
-
-                if (spanContent.length == 0) {   // check the last line
-                    $("#resumeButton").hide();
-                    $("#cancelButton").hide();
-                    $("#playResumeButton").hide();
-                    $("#playButton").show();
-                    countEnd = 0;
-                    isBegin = true;
-                    $('.line').removeClass('blue');
-                }
-                if (isBegin == false) {
-                    $("#resumeButton").show();
-                    $("#cancelButton").show();
-                    $("#playResumeButton").hide();
-                    $("#playButton").hide();
-                }
-                if (spanContent.length > 0) {
-                    hamdoc();
-                }
+        utterThis = new SpeechSynthesisUtterance(readingText);
+        utterThis.onend = function (event) {
+            if (spanContent.length == 0) {   // check the last line
+                $("#pauseButton").hide();
+                $("#cancelButton").hide();
+                $("#resumeButton").hide();
+                $("#playButton").show();
+                isSpeaking = false;
+                $('.line').removeClass('blue');
             }
-            utterThis.onerror = function (event) {
-                console.error('SpeechSynthesisUtterance.onerror');
+            if (isSpeaking && spanContent.length > 0) {
+                hamdoc();
             }
-            utterThis.onpause = function (event) {
-                console.error('SpeechSynthesisUtterance.onepause');
+        }
+        utterThis.onstart = function (event) {
+            $("#pauseButton").show();
+            $("#cancelButton").show();
+            $("#resumeButton").hide();
+            $("#playButton").hide();
+        }
+        utterThis.onpause = function (event) {
+            $("#pauseButton").hide();
+            $("#resumeButton").show();
+        }
+        utterThis.onresume = function (event) {
+            $("#pauseButton").show();
+            $("#resumeButton").hide();
+        }
+        utterThis.onerror = function (event) {
+            console.error(event);
+        }
+        var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+        for (i = 0; i < voices.length; i++) {
+            if (voices[i].name === selectedOption) {
+                utterThis.voice = voices[i];
             }
-            var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
-            for (i = 0; i < voices.length; i++) {
-                if (voices[i].name === selectedOption) {
-                    utterThis.voice = voices[i];
-                }
-            }
-            utterThis.rate = rate.value;
-            synth.cancel();
-            synth.speak(utterThis);
-            /*
-            var r = setInterval(function () {
-                if (spanContent.length > 0) {
-                    console.log(synth.speaking);
-                    if (!synth.speaking){
-                        clearInterval(r);
-                        hamdoc();
-                    }
-                    else synth.resume();
-                }}, 14000);*/
+        }
+        utterThis.rate = rate.value;
+        synth.cancel();
+        synth.speak(utterThis);
     }
 
     rate.onchange = function () {
-        rateValue.textContent = rate.value;  //Change speed value read
+        //rateValue.textContent = rate.value;  // Change speed value read
     }
 
     /*
     Handle resume, cancel,play to read
     */
-    $("#resumeButton").click(function () {//handle pause button
-        if (isClick == true) {
-            synth.pause();
-            isClick = false;
-            $("#resumeButton").hide();
-            $("#playResumeButton").show();
-        }
+    $("#pauseButton").click(function () { // handle pause button
+        $(this).hide();
+        synth.pause();
     });
 
-    $("#playResumeButton").click(function () {//handle resume button
-        if (isClick == false) {
-            synth.resume();
-            isClick = true;
-            $("#resumeButton").show();
-            $("#playResumeButton").hide();
-        }
+    $("#resumeButton").click(function () { // handle resume button
+        $(this).hide();
+        synth.resume();
     });
-    $("#cancelButton").click(function () {//handle cancel button
-        if (isBegin == false) {
-            synth.cancel();
-            location.reload();
-            $("#resumeButton").hide();
-            $("#cancelButton").hide();
-            $("#playResumeButton").hide();
-            $("#playButton").show();
-            isBegin = true;
-        }
+    $("#cancelButton").click(function () { // handle cancel button
+        synth.cancel();
+        isSpeaking = false;
+        $("#pauseButton").hide();
+        $("#cancelButton").hide();
+        $("#resumeButton").hide();
+        $("#playButton").show();
     });
-    $("#playButton").click(function () {//handle play button
-
-        if (isEnded == spanContent.length) {
-            isEnded = 0;
-        }
-        if (isBegin == true) {
-            $("#resumeButton").show();
-            $("#cancelButton").show();
-            $("#playResumeButton").hide();
-            $("#playButton").hide();
+    // handle play button
+    $("#playButton").click(function () {
+        if (spanContent.length > 0) {
+            $(this).hide();
             hamdoc();
         }
-        isBegin = false;
     });
     function hamdoc() {
+        isSpeaking = true;
         $('.line').removeClass('blue');
         $(spanContent[0]).addClass('blue');
         speak($(spanContent[0]).text());
         spanContent.reverse();
         spanContent.pop();
         spanContent.reverse();
-
     }
 
     isOnclick = false; //to set run play
@@ -320,11 +284,8 @@
     Run when load
     */
     $(document).ready(function () {
-
-        $("#playResumeButton").hide();
         $("#replayButton").hide();
-        $('#rate').slider({
-        });
+        $('#rate').slider({});
 
     });
 
