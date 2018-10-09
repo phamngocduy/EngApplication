@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Fizzler.Systems.HtmlAgilityPack;
+using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
@@ -103,9 +106,32 @@ namespace EngApplication.Controllers
             return String.Join("\n", texts);
         }
 
-        public string Lookup(string word)
+        [HttpPost]
+        public string Lookup(string findWord)
         {
-            return "";
+            var foundWord = "";
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+
+            HtmlWeb htmlWeb = new HtmlWeb();
+            {
+                //Load trang web, n?p html vào document
+                HtmlDocument document = htmlWeb.Load("https://dictionary.cambridge.org/vi/dictionary/english-vietnamese/" + findWord);
+                var threadItems = document.DocumentNode.QuerySelectorAll(".di-body.normal-entry-body .pos-body .def-block .def-body .trans").ToList();
+                var threadItems1 = document.DocumentNode.QuerySelectorAll("div.di-head.normal-entry .di-info .pron").ToList();
+                foreach (var item in threadItems1)
+                {
+                    foundWord += item.InnerHtml + "<br/>";
+
+                }
+                foreach (var item in threadItems)
+                {
+                    foundWord += item.InnerHtml + "<br/>";
+
+                }
+                return foundWord;
+            }
         }
     }
 }

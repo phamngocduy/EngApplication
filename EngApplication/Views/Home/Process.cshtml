@@ -52,6 +52,8 @@
             }
         }
     </div>
+    <div id="resultWord" style="height:500px; width:1000px">
+    </div>
 </div>
 <style>
     span.line:hover {
@@ -288,7 +290,38 @@
         $('#rate').slider({});
 
     });
-
+    /*
+    Handle lookup dictionary
+    */
+    $('span').find('.word').dblclick(function () {
+        findWord = $(this).text();
+        utterThis = new SpeechSynthesisUtterance(findWord);
+        var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+        for (i = 0; i < voices.length; i++) {
+            if (voices[i].name === selectedOption) {
+                utterThis.voice = voices[i];
+            }
+        }
+        utterThis.rate = rate.value;
+        synth.cancel();
+        synth.speak(utterThis);
+        $.ajax({
+            type: "POST",
+            url: "/Home/Lookup",
+            contentType: "application/json; charset=utf-8",
+            data: '{"findWord":"' + findWord + '"}',
+            dataType: "html",
+            success: function (result, status, xhr) {
+                document.getElementById("resultWord").innerHTML = "";
+                document.getElementById("resultWord").innerHTML = result;
+            },
+            error: function (xhr, status, error) {
+                alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+            }
+        });
+        return false;
+    });
+    
     </script>
     <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
