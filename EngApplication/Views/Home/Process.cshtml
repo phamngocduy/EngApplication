@@ -60,6 +60,9 @@
     span.bold {
         font-weight: bold;
     }
+    span.italic {
+        font-style: italic;
+    }
     span.underline {
         text-decoration: underline;
     }
@@ -305,8 +308,10 @@
 
 @section Script2 {
 <script>
-    var is_limit = false;
-    var check_index = 0;
+    var is_final = false;
+    var check_index1 = 0;
+    var check_index2 = 0;
+    var new_sentence = false;
     var final_transcript = '';
     var recognizing = false;
     var ignore_onend;
@@ -357,7 +362,7 @@
                 return;
             }
             showInfo('');
-            if (is_limit) startButton(event);
+            if (is_final) startButton(event);
         };
 
         recognition.onresult = function (event) {
@@ -369,9 +374,11 @@
                 return;
             }
             for (var i = event.resultIndex; i < event.results.length; ++i) {
-                if (is_limit = event.results[i].isFinal) {
+                if (is_final = event.results[i].isFinal) {
                     recognition.stop();
+                    check_index1 = check_index2;
                     final_transcript += event.results[i][0].transcript;
+                    console.log(final_transcript);
                 } else {
                     interim_transcript += event.results[i][0].transcript;
                 }
@@ -379,33 +386,64 @@
             //final_span.innerHTML = linebreak(final_transcript);
             //interim_span.innerHTML = linebreak(interim_transcript);
             showInfo(interim_transcript);
-            if (spanContent.length > 0) {
+            if (spanContent.length > 0 && !new_sentence) {
                 var sentence = $(spanContent[0]).find('.word');
                 var transcript = interim_transcript.toLocaleLowerCase().split(' ');
-                check_correct(sentence, transcript, 0);
-                for (var i = 0; i < sentence.length; i++)
-                    if ($(sentence[i]).hasClass('green'))
-                        check_index = i;
-                check_correct(sentence, transcript, check_index > 0 ? check_index + 1 : 0);
-                if (sentence.last().hasClass('green')) {
+                check_index2 = check_correct(sentence, transcript, check_index1);
+                if (check_index1 > 0)
+                    if (check_correct(sentence, transcript, 0) > check_index2 - check_index1)
+                        check_index1 = 0;
+                $('span.bold').removeClass('bold');
+                $('span.italic').removeClass('italic');
+                $(sentence[check_index1]).addClass('bold');
+                $(sentence[check_index2]).addClass('italic');
+                if (sentence.last().hasClass('green') ||
+                    sentence.last().prev().hasClass('green')) {
                     spanContent.reverse();
                     spanContent.pop();
                     spanContent.reverse();
                     interim_transcript = '';
-                    check_index = 0;
+                    check_index1 = 0;
+                    check_index2 = 0;
                     recognition.stop();
+                    new_sentence = true;
                 }
             }
         };
     }
 
+    function are_equal(sentence, transcript) {
+        return $(sentence).text().toLocaleLowerCase() == transcript;
+    }
+    function mark_right(word) {
+        $(word).removeClass('red').addClass('green');
+    }
+    function mark_wrong(word) {
+        $(word).not('.green').addClass('red');
+    }
     function check_correct(sentence, transcript, index) {
-        for (var i = 0; i < Math.max(sentence.length - index, transcript.length) ; i++) {
-            if ($(sentence[index + i]).text().toLocaleLowerCase() == transcript[i])
-                $(sentence[index + i]).removeClass('red').addClass('green');
-            else
-                $(sentence[index + i]).not('.green').addClass('red');
+        var i = index, j = 0;
+        while (i < sentence.length && j < transcript.length) {
+            if (are_equal(sentence[i], transcript[j])) {
+                mark_right(sentence[i]);
+                i++; j++;
+                index = i; continue;
+            }
+            if (i < sentence.length - 1 && j < transcript.length - 1) {
+                if (are_equal(sentence[i], transcript[j + 1])) {
+                    mark_right(sentence[i]);
+                    i++; j++; j++;
+                    index = i; continue;
+                }
+                if (are_equal(sentence[i + 1], transcript[j])) {
+                    mark_right(sentence[i + 1]);
+                    i++; i++; j++;
+                    index = i; continue;
+                }
+            }
+            i++; j++;
         }
+        return index;
     }
 
     function upgrade() {
@@ -415,11 +453,11 @@
 
     function startButton(event) {
         if (recognizing) {
-            is_limit = false;
+            is_final = false;
             recognition.stop();
             return;
-        }
-        final_transcript = is_limit ? final_transcript : '';
+        } else new_sentence = false;
+        final_transcript = '';
         recognition.lang = 'en-US';
         recognition.start();
         ignore_onend = false;
