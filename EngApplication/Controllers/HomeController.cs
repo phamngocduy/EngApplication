@@ -113,7 +113,6 @@ namespace EngApplication.Controllers
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-
             HtmlWeb htmlWeb = new HtmlWeb();
             {
                 //Load trang web, n?p html vào document
