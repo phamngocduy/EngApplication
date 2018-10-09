@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Fizzler.Systems.HtmlAgilityPack;
+using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
@@ -36,7 +39,7 @@ namespace EngApplication.Controllers
             return View("Process", split(text).Split('\n'));
         }
 
-        readonly float MAX = 200;
+        readonly float MAX = 500;
         public String split(string text = "")
         {
             var texts = new List<String>();
@@ -55,7 +58,18 @@ namespace EngApplication.Controllers
                     else if (String.IsNullOrWhiteSpace(sentences[i]))
                         sentences.RemoveAt(i);
                 foreach (var sentence in sentences)
-                    if (sentence.Length <= MAX)
+                    if (sentence.Length <= 2)
+                    {
+                        if (texts.Count > 0)
+                        {
+                            if (texts.Last().Length + sentence.Length <= MAX)
+                            {
+                                texts.Add(texts.Last() + sentence);
+                                texts.RemoveAt(texts.Count - 2);
+                            }
+                        }
+                    }
+                    else if (sentence.Length <= MAX)
                         texts.Add(sentence);
                     else
                     {
@@ -90,6 +104,33 @@ namespace EngApplication.Controllers
                 texts.Add(String.Empty);
             }
             return String.Join("\n", texts);
+        }
+
+        [HttpPost]
+        public string Lookup(string findWord)
+        {
+            var foundWord = "";
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            HtmlWeb htmlWeb = new HtmlWeb();
+            {
+                //Load trang web, n?p html vào document
+                HtmlDocument document = htmlWeb.Load("https://dictionary.cambridge.org/vi/dictionary/english-vietnamese/" + findWord);
+                var threadItems = document.DocumentNode.QuerySelectorAll(".di-body.normal-entry-body .pos-body .def-block .def-body .trans").ToList();
+                var threadItems1 = document.DocumentNode.QuerySelectorAll("div.di-head.normal-entry .di-info .pron").ToList();
+                foreach (var item in threadItems1)
+                {
+                    foundWord += item.InnerHtml + "<br/>";
+
+                }
+                foreach (var item in threadItems)
+                {
+                    foundWord += item.InnerHtml + "<br/>";
+
+                }
+                return foundWord;
+            }
         }
     }
 }

@@ -188,7 +188,7 @@
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (is_limit = event.results[i].isFinal) {
                     recognition.stop();
-                    final_transcript += event.results[i][0].transcript;
+                    final_transcript += ' ' + event.results[i][0].transcript;
                 } else {
                     interim_transcript += event.results[i][0].transcript;
                 }

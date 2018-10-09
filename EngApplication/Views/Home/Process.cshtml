@@ -3,27 +3,29 @@
 @{
     ViewBag.Title = "Practicing";
 }
+
 <link rel="stylesheet" type="text/css" href="~/Content/style.css" />
 <hr />
 
 <div class="row">
     <div class="col-sm-3 form-inline">
         <select class="form-control" id="voices"></select>
+        <input type="range" data-slider-min="0.5" data-slider-max="2" data-slider-value="1" data-slider-step="0.1" id="rate">
     </div>
-    <div class="form-inline col-sm-3">
-        <label for="rate">Rate</label><input type="range" min="0.5" max="2" value="1" step="0.1" id="rate">
-        <div class="rate-value">1</div>
-        <div class="clearfix"></div>
+    <div class="col-sm-3 form-inline">
+        <button id="playButton" class="btn" title="Play" data-toggle="popover" data-trigger="hover" data-content="Click hear to play"><img id="play" src="~/Content/Play-icon.png" /></button>
+        <button id="resumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume" style="display:none"><img id="play" src="~/Content/Play-icon.png" /></button>
+        <button id="pauseButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause" style="display:none"><img id="play" src="~/Content/Pause-icon.png"></button>
+        <button id="cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop" style="display:none"><img id="play" src="~/Content/Stop-icon.png"></button>
     </div>
 
-    <div class="col-sm-3 form-inline">
-        <button id="playButton" class="btn"><img id="play" src="~/Content/Play-icon.png" /></button>
-        <button id="resumeButton" class="btn"><img id="play" src="~/Content/Pause-icon.png"></button>
-        <button id="cancelButton" class="btn"><img id="play" src="~/Content/Stop-icon.png"></button>
-    </div>
-    <div class="form-inline col-sm-3">
+    <div class="form-inline col-sm-6">
+        <button id="start_button" onclick="startButton(event)">
+            <img alt="Start" id="start_img" src="/content/mic.gif">
+        </button>
         <button id="recordButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" onclick="mousePressed1()"><img id="play" src="~/Content/Button-Fast-Forward-icon.png"></button>
-        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
+        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to replay recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
+        <button id="replayButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Speak-2-icon.png"></button>
         <button id="downloadButton" class="btn" title="Downloading" data-toggle="popover" data-trigger="hover" data-content="Click hear to downloading" onclick="mousePressed3()"><img id="play" src="~/Content/Network-Download-icon.png"></button>
 
     </div>
@@ -31,33 +33,37 @@
 
 <div class="well">
     <div class="container">
-    @foreach (var text in Model)
-    {
-        if (String.IsNullOrEmpty(text))
+        @foreach (var text in Model)
         {
-            <br /><br />
-        }
-        else
-        {
-            <span class="line">
-            @MvcHtmlString.Create("<!--")
-            @foreach (var word in Regex.Split(text, "([a-zA-Z]+)"))
+            if (String.IsNullOrEmpty(text))
             {
-                @MvcHtmlString.Create("-->")<span class="@(Regex.IsMatch(word, "[a-zA-Z]+") ? "word" : word.Contains('.') ? "dot" : null)">@word</span>@MvcHtmlString.Create("<!--")
+            <br /><br />
             }
-            @MvcHtmlString.Create("-->")
-            </span>
+            else
+            {
+                <span class="line">
+                @MvcHtmlString.Create("<!--")
+                @foreach (var word in Regex.Split(text, "([a-zA-Z]+)"))
+                {
+                    @MvcHtmlString.Create("-->")<span class="@(Regex.IsMatch(word, "[a-zA-Z]+") ? "word" : word.Contains('.') ? "dot" : null)">@word</span>@MvcHtmlString.Create("<!--")
+                }
+                @MvcHtmlString.Create("-->")
+                </span>
+            }
         }
-    }
+    </div>
+    <div id="resultWord" style="height:500px; width:1000px">
     </div>
 </div>
-
 <style>
     span.line:hover {
         text-decoration: underline;
     }
     span.bold {
         font-weight: bold;
+    }
+    span.italic {
+        font-style: italic;
     }
     span.underline {
         text-decoration: underline;
@@ -66,14 +72,17 @@
         cursor: pointer;
     }
     span.red {
-        color: Red;
+        color: red;
     }
     span.green {
-        color: Green;
+        color: green;
+    }
+    span.blue {
+        color: blue;
     }
 </style>
 
-@section Scripts {
+@section Script1 {
 <script>
     $(function () {
         $('span.word').click(function () {
@@ -84,32 +93,37 @@
         setContent($('span.line'));
     });
 
-    Content = [];
+    spanContent = [];
+    textContent = [];
+
     function setContent(sentences) {
-        Content = [];
+        spanContent = [];
         sentences.each(function () {
             var sentence = [];
             $(this).find('span.word').each(function () {
                 sentence.push($(this).text().toLowerCase());
             });
-            Content.push(sentence);
+            spanContent.push(this);
         })
+        textContent = spanContent.slice(0);
     }
 
     // start coding here
+    //get speechSynthesis library from google
     var synth = window.speechSynthesis;
-    var inputForm = document.querySelector('form');
     var voiceSelect = document.querySelector('select');
     var mic, recorder, soundFile;
     var state = 0; // mousePress will increment from Record, to Stop, to Play
     var rate = document.querySelector('#rate');
-    var rateValue = document.querySelector('.rate-value');
-    var listVoice = ["David", "Zira", "Mark", "Chelsea", "Peter", "Sergio"];
+    var listVoice = ["David", "Zira", "Mark", "Chelsea", "Peter", "Sergio"];    //array name for google voices
     var voices = [];
-    var isClick = true;
-    var count = 1;
-    var isBegin = true;
-    //Get voices
+    var isClick = true;                                                         //boolean for handle reading text
+    var count = 1;                                                              //count for handle recording
+    var isBegin = true;                                                         //set state for begin in reading
+    var countEnd= 0;                                                            //count for handle record to auto end
+    /*
+    Get voices from google
+    */
     function populateVoiceList() {
         voices = synth.getVoices();
         var selectedIndex = voiceSelect.selectedIndex < 0 ? 0 : voiceSelect.selectedIndex;
@@ -124,11 +138,9 @@
                 } else {
                     option.innerHTML = listVoice[j] + ' (' + voices[i].lang + ')';
                 }
-
                 j++;
                 isLang = true;
             }
-
             if (voices[i].default) {
                 option.innerHTML += '';
             }
@@ -138,7 +150,6 @@
                 option.value = j;
                 voiceSelect.appendChild(option);
             }
-
         }
         voiceSelect.selectedIndex = selectedIndex;
     }
@@ -148,122 +159,356 @@
         speechSynthesis.onvoiceschanged = populateVoiceList;
     }
 
-    //Handle read here
-    function speak(speakingHere) {
-        if (speakingHere !== '') {
-            var utterThis = new SpeechSynthesisUtterance(speakingHere);
-            utterThis.onend = function (event) {
-                console.log('SpeechSynthesisUtterance.onend');
-                $("#resumeButton").hide();
+    /*
+     Handle function to read Text
+     */
+    var isSpeaking = false;
+    function speak(readingText) {
+        utterThis = new SpeechSynthesisUtterance(readingText);
+        utterThis.onend = function (event) {
+            if (spanContent.length == 0) {   // check the last line
+                $("#pauseButton").hide();
                 $("#cancelButton").hide();
+                $("#resumeButton").hide();
                 $("#playButton").show();
-                isBegin = true;
+                isSpeaking = false;
+                $('.line').removeClass('blue');
+                spanContent = textContent.slice(0);
             }
-            utterThis.onerror = function (event) {
-                console.error('SpeechSynthesisUtterance.onerror');
+            if (isSpeaking && spanContent.length > 0) {
+                hamdoc();
             }
-            utterThis.onpause = function (event) {
-                console.error('SpeechSynthesisUtterance.onepause');
-            }
-            var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
-            for (i = 0; i < voices.length; i++) {
-                if (voices[i].name === selectedOption) {
-                    utterThis.voice = voices[i];
-                }
-            }
-            utterThis.rate = rate.value;
-            synth.speak(utterThis);
         }
-    }
-    //Change speed value read
-    rate.onchange = function () {
-        rateValue.textContent = rate.value;
-    }
-
-    //
-    $("#resumeButton").click(function () {
-
-        if (isClick == true) {
-            synth.pause();
-            isClick = false;
-        } else {
-            synth.resume();
-            isClick = true;
-        }
-
-    });
-    $("#cancelButton").click(function () {
-        if (isBegin == false) {
-            synth.cancel();
+        utterThis.onstart = function (event) {
+            $("#pauseButton").show();
+            $("#cancelButton").show();
             $("#resumeButton").hide();
-            $("#cancelButton").hide();
-            $("#playButton").show();
-            isBegin = true;
+            $("#playButton").hide();
         }
-
-    });
-    //////////////-Reading-Here////////////////////////
-    $("#playButton").click(function (event) {
-        if (isBegin == true) {
-            event.preventDefault();
-            //Read each text in array Content
-            for (let i = 0; i < Content.length; i++) {
-                for (let j = 0; j < Content[i].length; j++) {
-                    speak(Content[i][j]);
-                    $("#resumeButton").show();
-                    $("#cancelButton").show();
-                    $("#playButton").hide();
-                }
+        utterThis.onpause = function (event) {
+            $("#pauseButton").hide();
+            $("#resumeButton").show();
+        }
+        utterThis.onresume = function (event) {
+            $("#pauseButton").show();
+            $("#resumeButton").hide();
+        }
+        utterThis.onerror = function (event) {
+            console.error(event);
+        }
+        var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+        for (i = 0; i < voices.length; i++) {
+            if (voices[i].name === selectedOption) {
+                utterThis.voice = voices[i];
             }
-            isBegin = false;
+        }
+        utterThis.rate = rate.value;
+        synth.cancel();
+        synth.speak(utterThis);
+    }
+
+    /*
+    Handle resume, cancel,play to read
+    */
+    $("#pauseButton").click(function () { // handle pause button
+        $(this).hide();
+        synth.pause();
+    });
+
+    $("#resumeButton").click(function () { // handle resume button
+        $(this).hide();
+        synth.resume();
+    });
+    $("#cancelButton").click(function () { // handle cancel button
+        synth.cancel();
+        isSpeaking = false;
+        $("#pauseButton").hide();
+        $("#cancelButton").hide();
+        $("#resumeButton").hide();
+        $("#playButton").show();
+    });
+    // handle play button
+    $("#playButton").click(function () {
+        if (spanContent.length > 0) {
+            $(this).hide();
+            hamdoc();
         }
     });
-    //Setup mic onload
-    function setup() {
+    function hamdoc() {
+        isSpeaking = true;
+        $('.line').removeClass('blue');
+        $(spanContent[0]).addClass('blue');
+        speak($(spanContent[0]).text());
+        spanContent.reverse();
+        spanContent.pop();
+        spanContent.reverse();
+    }
+
+    isOnclick = false; //to set run play
+    function setup() { //Setup mic onload
         mic = new p5.AudioIn();
         mic.start();
         recorder = new p5.SoundRecorder();
         recorder.setInput(mic);
         soundFile = new p5.SoundFile();
     }
-
-    isOnclick = false;
     function mousePressed1() {
         isOnclick = true;
         state = 0;
-
-        if (state === 0 && mic.enabled) {
+        if (state === 0 && mic.enabled) {//set state to hide or show and state
             recorder.record(soundFile);
-            $("#play1").attr('src', "\Stop-icon.png");
+            $('#recordingStopButton').show();
+            $('#replayButton').hide();
             state++;
         }
         if (isOnclick == true) {
-            $("#recordingStopButton").attr('data-content', 'Click here to stop recording!');
-            $("#recordButton").attr('data-content', 'Recording!');
             isOnclick = false;
         }
     }
-    //Stop record and play again
-    function mousePressed2() {
+    function mousePressed2() {//Stop record and play again
         if (state === 1) {
             recorder.stop(); // stop recorder, and send the result to soundFile
             state++;
-            $("#recordingStopButton").attr('data-content', 'Click here to hear your voice!');
-            $("#play1").attr('src', "\Speak-2-icon.png");
-
+            $('#recordingStopButton').hide();
+            $('#replayButton').show();
         } else if (state === 2) {
             soundFile.play(); // play the result
         }
-        $("#recordButton").attr('data-content', 'Click here to begin record');
     }
-    //Download here
-    function mousePressed3() {
+    function mousePressed3() {//Download here
         if (state === 2) {
             saveSound(soundFile, 'mySound.wav'); // save file
             $("#recordButton").attr('data-content', 'Click here to begin recording');
         }
     }
+
+    /*
+    Run when load
+    */
+    $(document).ready(function () {
+        $("#replayButton").hide();
+        $('#rate').slider({});
+
+    });
+    /*
+    Handle lookup dictionary
+    */
+    $('span').find('.word').dblclick(function () {
+        findWord = $(this).text();
+        utterThis = new SpeechSynthesisUtterance(findWord);
+        var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+        for (i = 0; i < voices.length; i++) {
+            if (voices[i].name === selectedOption) {
+                utterThis.voice = voices[i];
+            }
+        }
+        utterThis.rate = rate.value;
+        synth.cancel();
+        synth.speak(utterThis);
+        $.ajax({
+            type: "POST",
+            url: "/Home/Lookup",
+            contentType: "application/json; charset=utf-8",
+            data: '{"findWord":"' + findWord + '"}',
+            dataType: "html",
+            success: function (result, status, xhr) {
+                document.getElementById("resultWord").innerHTML = "";
+                document.getElementById("resultWord").innerHTML = result;
+            },
+            error: function (xhr, status, error) {
+                alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
+            }
+        });
+        return false;
+    });
+    
+    </script>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css" rel="stylesheet" />
+}
+
+<nav id="info" class="navbar navbar-default navbar-fixed-bottom" style="min-height:0">
+    <div class="container">
+        <div class="navbar-header">
+            <span id="interim"></span>
+        </div>
+    </div>
+</nav>
+
+@section Script2 {
+<script>
+    var is_final = false;
+    var check_index1 = 0;
+    var check_index2 = 0;
+    var new_sentence = false;
+    var final_transcript = '';
+    var recognizing = false;
+    var ignore_onend;
+    var start_timestamp;
+    if (!('webkitSpeechRecognition' in window)) {
+        upgrade();
+    } else {
+        start_button.style.display = 'inline-block';
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onstart = function () {
+            recognizing = true;
+            showInfo('Speak now.');
+            start_img.src = '/content/mic-animate.gif';
+        };
+
+        recognition.onerror = function (event) {
+            if (event.error == 'no-speech') {
+                start_img.src = '/content/mic.gif';
+                showInfo('No speech was detected. You may need to adjust your microphone settings.');
+                ignore_onend = true;
+            }
+            if (event.error == 'audio-capture') {
+                start_img.src = '/content/mic.gif';
+                showInfo('No microphone was found. Ensure that a microphone is installed and that microphone settings are configured correctly.');
+                ignore_onend = true;
+            }
+            if (event.error == 'not-allowed') {
+                if (event.timeStamp - start_timestamp < 100) {
+                    showInfo('Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream');
+                } else {
+                    showInfo('Permission to use microphone was denied.');
+                }
+                ignore_onend = true;
+            }
+        };
+
+        recognition.onend = function (event) {
+            recognizing = false;
+            if (ignore_onend) {
+                return;
+            }
+            start_img.src = '/content/mic.gif';
+            if (!final_transcript) {
+                showInfo('Click on the microphone icon and begin speaking for as long as you like.');
+                return;
+            }
+            showInfo('');
+            if (is_final) startButton(event);
+        };
+
+        recognition.onresult = function (event) {
+            var interim_transcript = '';
+            if (typeof (event.results) == 'undefined') {
+                recognition.onend = null;
+                recognition.stop();
+                upgrade();
+                return;
+            }
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (is_final = event.results[i].isFinal) {
+                    recognition.stop();
+                    check_index1 = check_index2;
+                    final_transcript += event.results[i][0].transcript;
+                    console.log(final_transcript);
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+            //final_span.innerHTML = linebreak(final_transcript);
+            //interim_span.innerHTML = linebreak(interim_transcript);
+            showInfo(interim_transcript);
+            if (spanContent.length > 0 && !new_sentence) {
+                var sentence = $(spanContent[0]).find('.word');
+                var transcript = interim_transcript.toLocaleLowerCase().split(' ');
+                check_index2 = check_correct(sentence, transcript, check_index1);
+                if (check_index1 > 0)
+                    if (check_correct(sentence, transcript, 0) > check_index2 - check_index1)
+                        check_index1 = 0;
+                $('span.bold').removeClass('bold');
+                $('span.italic').removeClass('italic');
+                $(sentence[check_index1]).addClass('bold');
+                $(sentence[check_index2]).addClass('italic');
+                if (sentence.last().hasClass('green') ||
+                    sentence.last().prev().hasClass('green')) {
+                    spanContent.reverse();
+                    spanContent.pop();
+                    spanContent.reverse();
+                    interim_transcript = '';
+                    check_index1 = 0;
+                    check_index2 = 0;
+                    recognition.stop();
+                    new_sentence = true;
+                }
+            }
+        };
+    }
+
+    function are_equal(sentence, transcript) {
+        return $(sentence).text().toLocaleLowerCase() == transcript;
+    }
+    function mark_right(word) {
+        $(word).removeClass('red').addClass('green');
+    }
+    function mark_wrong(word) {
+        $(word).not('.green').addClass('red');
+    }
+    function check_correct(sentence, transcript, index) {
+        var i = index, j = 0;
+        while (i < sentence.length && j < transcript.length) {
+            if (are_equal(sentence[i], transcript[j])) {
+                mark_right(sentence[i]);
+                i++; j++;
+                index = i; continue;
+            }
+            if (i < sentence.length - 1 && j < transcript.length - 1) {
+                if (are_equal(sentence[i], transcript[j + 1])) {
+                    mark_right(sentence[i]);
+                    i++; j++; j++;
+                    index = i; continue;
+                }
+                if (are_equal(sentence[i + 1], transcript[j])) {
+                    mark_right(sentence[i + 1]);
+                    i++; i++; j++;
+                    index = i; continue;
+                }
+            }
+            i++; j++;
+        }
+        return index;
+    }
+
+    function upgrade() {
+        start_button.style.visibility = 'hidden';
+        showInfo('Web Speech API is not supported by this browser. Upgrade to Chrome version 25 or later.');
+    }
+
+    function startButton(event) {
+        if (recognizing) {
+            is_final = false;
+            recognition.stop();
+            return;
+        } else new_sentence = false;
+        final_transcript = '';
+        recognition.lang = 'en-US';
+        recognition.start();
+        ignore_onend = false;
+        //final_span.innerHTML = final_transcript;
+        showInfo(final_transcript);
+        //interim_span.innerHTML = '';
+        start_img.src = '/content/mic-slash.gif';
+        showInfo('Click the "Allow" button above to enable your microphone.');
+        start_timestamp = event.timeStamp;
+    }
+
+    function showInfo(s) {
+        if (s) {
+            $('#interim').text(s);
+            info.style.visibility = 'visible';
+        } else {
+            info.style.visibility = 'hidden';
+        }
+    }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
 }
