@@ -52,8 +52,9 @@
             }
         }
     </div>
-    <div id="resultWord" style="height:500px; width:1000px">
+   
     </div>
+    <div id="resultWord" style="height:500px; width:1000px">
 </div>
 <style>
     span.line:hover {
@@ -293,7 +294,10 @@
     /*
     Handle lookup dictionary
     */
-    $('span').find('.word').dblclick(function () {
+    var oldText = "";
+    var replacePopover = "";
+    $('span').find('.word').dblclick(function (e) {
+       
         findWord = $(this).text();
         utterThis = new SpeechSynthesisUtterance(findWord);
         var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
@@ -311,9 +315,19 @@
             contentType: "application/json; charset=utf-8",
             data: '{"findWord":"' + findWord + '"}',
             dataType: "html",
+            context: this,
             success: function (result, status, xhr) {
-                document.getElementById("resultWord").innerHTML = "";
-                document.getElementById("resultWord").innerHTML = result;
+                var wordSplit = result.split("|");
+                $(this).attr('data-content', wordSplit[1]);
+                $(this).attr('title', wordSplit[0]);
+                $(this).attr('data-trigger', 'hover');
+                $(this).attr('data-html',true);
+                $(this).popover();
+                oldText= findWord;
+                
+                $(document).ready(function () {
+                    $('[data-toggle="popover"]').popover();
+                });
             },
             error: function (xhr, status, error) {
                 alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -321,7 +335,7 @@
         });
         return false;
     });
-    
+   
     </script>
     <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>

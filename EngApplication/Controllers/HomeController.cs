@@ -121,12 +121,13 @@ namespace EngApplication.Controllers
                 var threadItems1 = document.DocumentNode.QuerySelectorAll("div.di-head.normal-entry .di-info .pron").ToList();
                 foreach (var item in threadItems1)
                 {
-                    foundWord += item.InnerHtml + "<br/>";
+                    foundWord += item.InnerText+" ";
 
                 }
+                foundWord += "|";
                 foreach (var item in threadItems)
                 {
-                    foundWord += item.InnerHtml + "<br/>";
+                    foundWord += item.InnerHtml+"<br/>";
 
                 }
                 return foundWord;
