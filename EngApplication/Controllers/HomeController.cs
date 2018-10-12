@@ -115,6 +115,7 @@ namespace EngApplication.Controllers
 
             HtmlWeb htmlWeb = new HtmlWeb();
             {
+                int count = 0;
                 //Load trang web, n?p html vào document
                 HtmlDocument document = htmlWeb.Load("https://dictionary.cambridge.org/vi/dictionary/english-vietnamese/" + findWord);
                 var threadItems = document.DocumentNode.QuerySelectorAll(".di-body.normal-entry-body .pos-body .def-block .def-body .trans").ToList();
@@ -127,7 +128,12 @@ namespace EngApplication.Controllers
                 foundWord += "|";
                 foreach (var item in threadItems)
                 {
-                    foundWord += item.InnerHtml+"<br/>";
+                    if (count <= 10)
+                    {
+                        foundWord += item.InnerHtml + "<br/>";
+                        count++;
+                    }
+                    
 
                 }
                 return foundWord;
