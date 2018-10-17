@@ -85,6 +85,7 @@
 
 @section Script1 {
 <script>
+
     $(function () {
         $('span.word').click(function () {
             $('span.bold').removeClass('bold').parent('span.line').removeClass('underline');
@@ -289,6 +290,8 @@
     $(document).ready(function () {
         $("#replayButton").hide();
         $('#rate').slider({});
+        $('[data-toggle="popover"]').attr('unselectable', 'on');
+        $('[data-toggle="popover"]').on('selectstart', false);
 
     });
     /*
@@ -298,6 +301,9 @@
     var replacePopover = "";
     $('span').find('.word').dblclick(function (e) {
         $('.popover').popover('hide');
+        $(this).attr('unselectable', 'on');
+        $(this).css('user-select', 'none');
+        $(this).on('selectstart', false);
         findWord = $(this).text();
         
         utterThis = new SpeechSynthesisUtterance(findWord);
