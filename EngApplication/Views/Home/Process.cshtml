@@ -297,8 +297,9 @@
     var oldText = "";
     var replacePopover = "";
     $('span').find('.word').dblclick(function (e) {
-       
+        $('.popover').popover('hide');
         findWord = $(this).text();
+        
         utterThis = new SpeechSynthesisUtterance(findWord);
         var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
         for (i = 0; i < voices.length; i++) {
@@ -320,14 +321,11 @@
                 var wordSplit = result.split("|");
                 $(this).attr('data-content', wordSplit[1]);
                 $(this).attr('title', wordSplit[0]);
-                $(this).attr('data-trigger', 'hover');
+               $(this).attr('data-trigger', 'hover');
                 $(this).attr('data-html',true);
-                $(this).popover();
+                $(this).popover('show');
                 oldText= findWord;
-                
-                $(document).ready(function () {
-                    $('[data-toggle="popover"]').popover();
-                });
+                             
             },
             error: function (xhr, status, error) {
                 alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -335,7 +333,9 @@
         });
         return false;
     });
-   
+    $('span.word.bold').ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
     </script>
     <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
