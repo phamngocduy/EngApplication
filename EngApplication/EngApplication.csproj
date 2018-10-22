@@ -203,6 +203,7 @@
     <Content Include="Content\Play-icon.png" />
     <Content Include="Content\Speak-2-icon.png" />
     <Content Include="Content\Stop-icon.png" />
+    <Content Include="Scripts\notify.js" />
     <Content Include="Views\Home\Speak-2-icon.png" />
     <Content Include="Views\Home\Stop-icon.png" />
     <Content Include="Content\style.css" />

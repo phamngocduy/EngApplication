@@ -24,8 +24,8 @@
             <img alt="Start" id="start_img" src="/content/mic.gif">
         </button>
         <button id="recordButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" onclick="mousePressed1()"><img id="play" src="~/Content/Button-Fast-Forward-icon.png"></button>
-        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to replay recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
-        <button id="replayButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Speak-2-icon.png"></button>
+        <button id="recordingStopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Stop-icon.png"></button>
+        <button id="replayButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to replay recording" onclick="mousePressed2()"><img id="play1" src="~/Content/Speak-2-icon.png"></button>
         <button id="downloadButton" class="btn" title="Downloading" data-toggle="popover" data-trigger="hover" data-content="Click hear to downloading" onclick="mousePressed3()"><img id="play" src="~/Content/Network-Download-icon.png"></button>
 
     </div>
@@ -259,6 +259,8 @@
         state = 0;
         if (state === 0 && mic.enabled) {//set state to hide or show and state
             recorder.record(soundFile);
+            $.notify("Recording...", "info");
+            $('#recordButton').attr('data-content',"Recording....")
             $('#recordingStopButton').show();
             $('#replayButton').hide();
             state++;
@@ -272,6 +274,8 @@
             recorder.stop(); // stop recorder, and send the result to soundFile
             state++;
             $('#recordingStopButton').hide();
+            $.notify("Stopping Recording", "info");
+            $('#recordButton').attr('data-content', "Click here to begin recording")
             $('#replayButton').show();
         } else if (state === 2) {
             soundFile.play(); // play the result
@@ -279,6 +283,7 @@
     }
     function mousePressed3() {//Download here
         if (state === 2) {
+            $.notify("Downloading", "info");
             saveSound(soundFile, 'mySound.wav'); // save file
             $("#recordButton").attr('data-content', 'Click here to begin recording');
         }
@@ -305,6 +310,15 @@
         $(this).css('user-select', 'none');
         $(this).on('selectstart', false);
         findWord = $(this).text();
+    
+        $(this).attr('data-content', "Loading");
+        $(this).attr('data-trigger', 'hover');
+        $(this).popover({
+            html: true,
+            placement: "bottom"
+        });
+        
+        $(this).popover('show');
         
         utterThis = new SpeechSynthesisUtterance(findWord);
         var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
@@ -325,13 +339,10 @@
             context: this,
             success: function (result, status, xhr) {
                 var wordSplit = result.split("|");
-                $(this).attr('data-content', wordSplit[1]);
-                $(this).attr('title', wordSplit[0]);
-               $(this).attr('data-trigger', 'hover');
-                $(this).attr('data-html',true);
+                $(this).attr('data-content', "<div style='background-color: rgb(241,241,241);margin:-10px -10px 4px;font-size:14px;border-style:gridge; padding:5px 5px'>"+ wordSplit[0] + "</div>" + wordSplit[1]);
+                $(this).attr('data-html', true);
                 $(this).popover('show');
-                oldText= findWord;
-                             
+                oldText = findWord;                         
             },
             error: function (xhr, status, error) {
                 alert("Result: " + status + " " + error + " " + xhr.status + " " + xhr.statusText)
@@ -343,10 +354,11 @@
         $('[data-toggle="popover"]').popover();
     });
     </script>
-    <!--
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.1/addons/p5.sound.min.js"></script>
-    -->
+    <script src="~/Scripts/notify.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css" rel="stylesheet" />
 }
