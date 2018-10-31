@@ -1,7 +1,18 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-
+<style>
+    .jumbotron{
+         position:relative;
+    background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
+    background: rgba(204, 204, 204, 0.5);
+    }
+    #Textarea{
+         position:relative;
+    background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
+    background: rgb(255, 255, 255, 0.5);
+    }
+</style>
 <div class="jumbotron">
     <div class="form-group">
     @using (Html.BeginForm())

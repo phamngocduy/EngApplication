@@ -8,15 +8,16 @@
 <hr />
 
 <div class="row">
-    <div class="col-sm-3 form-inline">
-        <select class="form-control" id="voices"></select>
-        <input type="range" data-slider-min="0.5" data-slider-max="2" data-slider-value="1" data-slider-step="0.1" id="rate">
-    </div>
+    
     <div class="col-sm-3 form-inline">
         <button id="playButton" class="btn" title="Play" data-toggle="popover" data-trigger="hover" data-content="Click hear to play"><img id="play" src="~/Content/Play-icon.png" /></button>
         <button id="resumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume" style="display:none"><img id="play" src="~/Content/Play-icon.png" /></button>
         <button id="pauseButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause" style="display:none"><img id="play" src="~/Content/Pause-icon.png"></button>
         <button id="cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop" style="display:none"><img id="play" src="~/Content/Stop-icon.png"></button>
+    </div>
+    <div class="col-sm-3 form-inline ">
+        <select class="form-control" id="voices"></select>
+        <input type="range" data-slider-min="0.5" data-slider-max="2" data-slider-value="1" data-slider-step="0.1" id="rate">
     </div>
 
     <div class="form-inline col-sm-6">
