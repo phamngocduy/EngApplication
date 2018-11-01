@@ -11,28 +11,31 @@
             background-image: url('../../Content/sky-blue-backgrounds.jpg');
             height: 100%; 
 
-    /* Center and scale the image nicely */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .navbar-default .navbar-nav > li > a {
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-default navbar-fixed-top" style="background-color:#303ab2">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                </button>  
-                <a class="pull-left" href="@Url.Action("Index", "Home")"><img src="~/Content/logoreadout.png" style="max-height:45px;margin-right:20px;" /></a>   
+                </button>
+                <a class="pull-left" href="@Url.Action("Index", "Home")"><img src="~/Content/logoreadout.png" style="max-height:45px;margin-right:20px;" /></a>
             </div>
             <div class="navbar-collapse collapse">
-               
+
                 <ul class="nav navbar-nav navbar-left">
-                   
+
                     <li>@Html.ActionLink("Demo", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
@@ -42,7 +45,7 @@
                 </a>
             </div>
 
-           
+
         </div>
     </div>
     <div class="container body-content">

@@ -198,11 +198,13 @@
     <Content Include="Content\logoreadout.jpg" />
     <Content Include="Content\logoreadout.png" />
     <Content Include="Content\mic-animate.gif" />
+    <Content Include="Content\mic-animate1.gif" />
     <Content Include="Content\mic-slash.gif" />
-    <Content Include="Content\mic.gif" />
+    <Content Include="Content\mic1.gif" />
     <Content Include="Content\Network-Download-icon.png" />
     <Content Include="Content\Pause-icon.png" />
     <Content Include="Content\Play-icon.png" />
+    <Content Include="Content\mic.gif" />
     <Content Include="Content\sky-blue-backgrounds.jpg" />
     <Content Include="Content\Speak-2-icon.png" />
     <Content Include="Content\Stop-icon.png" />

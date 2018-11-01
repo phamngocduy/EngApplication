@@ -20,6 +20,10 @@
     width: 52px;
     height: 52px;
   }
+  .record{
+    width: 52px;
+    height: 52px;
+  }
 html{   
     -webkit-user-select: none; /* Chrome/Safari */        
     -moz-user-select: none; /* Firefox */
