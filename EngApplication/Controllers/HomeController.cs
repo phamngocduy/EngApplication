@@ -123,7 +123,6 @@ namespace EngApplication.Controllers
                 foreach (var item in threadItems1)
                 {
                     foundWord += item.InnerText+" ";
-
                 }
                 foundWord += "|";
                 foreach (var item in threadItems)
@@ -133,8 +132,6 @@ namespace EngApplication.Controllers
                         foundWord += item.InnerHtml + "<br/>";
                         count++;
                     }
-                    
-
                 }
                 return foundWord;
             }

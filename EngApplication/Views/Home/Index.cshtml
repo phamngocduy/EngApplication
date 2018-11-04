@@ -3,23 +3,24 @@
 }
 <style>
     .jumbotron{
-         position:relative;
-    background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
-    background: rgba(204, 204, 204, 0.5);
+        position: relative;
+        background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
+        background: rgba(204, 204, 204, 0.5);
     }
     #Textarea{
-         position:relative;
-    background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
-    background: rgb(255, 255, 255, 0.5);
+        max-width: 100%;
+        position: relative;
+        background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
+        background: rgba(255, 255, 255, 0.5);
     }
 </style>
 <div class="jumbotron">
     <div class="form-group">
     @using (Html.BeginForm())
     {
-        <label for="Textarea">Type, paste, and edit text here.</label>
+        <label for="Textarea"><i>Practice your English with</i> <a href="#">Read-Out!</a></label>
         <input type="submit" class="pull-right" value="Play" />
-        <textarea name="Text" class="form-control" id="Textarea" rows="8" style="max-width:100%"></textarea>
+        <textarea name="Text" class="form-control" id="Textarea" rows="8" placeholder="Type, paste, and edit text here."></textarea>
     }
     </div>
 </div>

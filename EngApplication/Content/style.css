@@ -1,46 +1,31 @@
-#play{
+div.slider-horizontal {
+    width: 100% !important;
+    max-width: 280px;
+}
+img.icon {
     width: 52px;
     height: 52px;
   }
-  button {
+
+button {
     background-color: Transparent;
     background-repeat:no-repeat;
     border: none;
-    cursor:pointer;
+    cursor: pointer;
     overflow: hidden;
-    outline:none;
-  }
-  #resumeButton{
-    display: none;
-  }
-  #cancelButton{
-    display: none;
-  }
-  #play1{
-    width: 52px;
-    height: 52px;
-  }
-  .record{
-    width: 52px;
-    height: 52px;
-  }
-html{   
+    outline: none;
+}
+
+html {   
     -webkit-user-select: none; /* Chrome/Safari */        
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
     user-select: none; 
-
-
 }
+
 div.well {
-   position:relative;
+    position:relative;
     background: rgb(204, 204, 204); /* Fallback for older browsers without RGBA-support */
     background: rgba(204, 204, 204, 0.5);
     font-size:16px;
 }
-
-
-
-
-  
-  
