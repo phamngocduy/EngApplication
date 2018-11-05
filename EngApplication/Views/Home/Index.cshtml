@@ -18,8 +18,10 @@
     <div class="form-group">
     @using (Html.BeginForm())
     {
+        @Html.Hidden("Type")
         <label for="Textarea"><i>Practice your English with</i> <a href="#">Read-Out!</a></label>
-        <input type="submit" class="pull-right" value="Play" />
+        <input type="submit" class="btn btn-primary pull-right" value="Next" />
+        <button class="btn" onclick="Practice(event, 'Speak')" title="Practice Listening"><img class="icon" src="@Url.Content("~/Content/out-play.png")" /></button>
         <textarea name="Text" class="form-control" id="Textarea" rows="8" placeholder="Type, paste, and edit text here."></textarea>
     }
     </div>
@@ -31,5 +33,10 @@
     $(function () {
         $('#Textarea').autogrow();
     });
+
+    function Practice(e, type) {
+        $(Type).val(type);
+        //e.preventDefault();
+    }
 </script>
 }

@@ -197,7 +197,6 @@
     <Content Include="Content\logo-vlu-6.png" />
     <Content Include="Content\logo-readout.png" />
     <Content Include="Content\mic-animate.gif" />
-    <Content Include="Content\mic-dynamic.gif" />
     <Content Include="Content\mic-slash.gif" />
     <Content Include="Content\mic.gif" />
     <Content Include="Content\rec-download.png" />

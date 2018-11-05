@@ -32,8 +32,9 @@ namespace EngApplication.Controllers
         }
 
         [HttpPost, ActionName("Index")]
-        public ActionResult Process(string text = "")
+        public ActionResult Process(string text = "", string type = null)
         {
+            ViewBag.Type = type;
             ViewBag.Text = text = text.Replace('“', '"').Replace('”', '"')
                                       .Replace('‘', '\'').Replace('’', '\'');
             return View("Process", split(text).Split('\n'));

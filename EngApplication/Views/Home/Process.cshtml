@@ -13,6 +13,7 @@
     const string saveButton = "saveButton";
 }
 <br />
+
 <div class="row">
     <div class="col-sm-3 form-inline">
         <select class="form-control" id="@speechVoices"></select>
@@ -27,7 +28,7 @@
     </div>
 
     <div class="col-sm-5 form-inline">
-        <button id="btn_record" onclick="startButton(event)">
+        <button id="btn_record" class="btn" onclick="startButton(event)">
             <img alt="Start" id="img_record" class="icon img-circle" src="@Url.Content("~/Content/mic-record.gif")">
         </button>
         <button id="@playButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" style="display:none"><img class="icon" src="~/Content/rec-play.png"></button>
@@ -382,7 +383,7 @@
         recognition.onstart = function () {
             recognizing = true;
             showInfo('Speak now.');
-            img_record.src = '@Url.Content("~/Content/mic-dynamic.gif")';
+            img_record.src = '@Url.Content("~/Content/mic-animate.gif")';
         };
 
         recognition.onerror = function (event) {
@@ -535,5 +536,14 @@
             info.style.visibility = 'hidden';
         }
     }
+</script>
+}
+
+@section Scripts {
+<script>
+    $(function () {
+        if ('@ViewBag.Type' == 'Speak')
+            $(@speakButton).trigger('click');
+    });
 </script>
 }
