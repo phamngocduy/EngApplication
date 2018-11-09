@@ -11,8 +11,10 @@
     const string playButton = "playButton";
     const string stopButton = "stopButton";
     const string saveButton = "saveButton";
+    
 }
 <br />
+
 <div class="row">
     <div class="col-sm-3 form-inline">
         <select class="form-control" id="@speechVoices"></select>
@@ -33,9 +35,11 @@
         <button id="@playButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" style="display:none"><img class="icon" src="~/Content/rec-play.png"></button>
         <button id="@stopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" style="display:none"><img class="icon" src="~/Content/out-stop.png"></button>
         <button id="@saveButton" class="btn" title="Downloading" data-toggle="popover" data-trigger="hover" data-content="Click hear to downloading" style="display:none"><img class="icon" src="~/Content/rec-download.png"></button>
-
+        
     </div>
+   
 </div>
+
 
 <div class="well">
     <div class="container">
@@ -60,6 +64,7 @@
     </div>
 
 </div>
+
 
 <style>
     span.line:hover {
@@ -298,20 +303,25 @@
     var oldText = "";
     var replacePopover = "";
     $('span').find('.word').dblclick(function (e) {
-        $('.popover').popover('hide');
+        if (typeof $(e.target).data('original-title') == 'undefined') {
+            $('[data-original-title]').popover('hide');
+        }
+
+
         $(this).attr('unselectable', 'on');
         $(this).css('user-select', 'none');
         $(this).on('selectstart', false);
         findWord = $(this).text();
 
         $(this).attr('data-content', "Loading...");
-        $(this).attr('data-trigger', 'hover');
+        $(this).attr('data-trigger', 'click');
         $(this).popover({
             html: true,
             placement: "bottom"
         });
 
         $(this).popover('show');
+        
 
         utterThis = new SpeechSynthesisUtterance(findWord);
         utterThis.voice = listVoices[$(@speechVoices).val()];
@@ -327,7 +337,7 @@
             context: this,
             success: function (result, status, xhr) {
                 var wordSplit = result.split("|");
-                $(this).attr('data-content', '<div style="background-color: rgb(241,241,241);margin:-10px -10px 4px;font-size:14px;border-style:gridge; padding:5px 5px">' + wordSplit[0] + '</div>' + wordSplit[1]);
+                $(this).attr('data-content', '<div style="background-color: rgb(241,241,241);margin:-10px -10px 4px;font-size:14px;border-style:gridge; padding:5px 5px" >' + wordSplit[0] +'<a href="#" style="float: right">'+'<i class="far fa-save"></i>'+'</a>'+ '</div>' + '<span>'+wordSplit[1]+'</span>');
                 $(this).attr('data-html', true);
                 $(this).popover('show');
                 oldText = findWord;
@@ -337,6 +347,11 @@
             }
         });
         return false;
+    });
+    $('html').on('click', function (e) {
+        if (typeof $(e.target).data('original-title') == 'undefined') {
+            $('[data-original-title]').popover('hide');
+        }
     });
     $('span.word.bold').ready(function () {
         $('[data-toggle="popover"]').popover();

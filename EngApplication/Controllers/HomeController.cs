@@ -129,7 +129,7 @@ namespace EngApplication.Controllers
                 {
                     if (count <= 10)
                     {
-                        foundWord += item.InnerHtml + "<br/>";
+                        foundWord += item.InnerText + "<br/>";
                         count++;
                     }
                 }
