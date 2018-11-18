@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practicing your English...</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <style>
@@ -51,7 +53,10 @@
     </div>
     <div class="container body-content">
         <div style="height:100vh">
+
+           
             @RenderBody()
+
         </div>
         <hr />
         <footer class="footer">
@@ -61,7 +66,19 @@
         </footer>
 
     </div>
-
+    @*Float button dictionary here*@
+    <div class="fab">
+        <span class="fab-action-button">
+            <i class="fab-action-button__icon"></i>
+        </span>
+        <ul class="fab-buttons">
+            <li class="fab-buttons__item">
+                <a href="#" class="fab-buttons__link" data-tooltip="Your dictionary">
+                    <span style="height:200px"> </span>
+                </a>
+            </li>
+        </ul>
+    </div>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("script1", required: false)
