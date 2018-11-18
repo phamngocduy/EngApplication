@@ -206,9 +206,6 @@
     <Content Include="Content\sky-blue-backgrounds.jpg" />
     <Content Include="Content\out-stop.png" />
     <Content Include="Scripts\notify.js" />
-    <Content Include="Views\Home\mic.gif" />
-    <Content Include="Views\Home\Speak-2-icon.png" />
-    <Content Include="Views\Home\Stop-icon.png" />
     <Content Include="Content\style.css" />
     <Content Include="Content\uk.png" />
     <Content Include="Content\us.png" />

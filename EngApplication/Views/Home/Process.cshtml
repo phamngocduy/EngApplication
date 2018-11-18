@@ -21,19 +21,19 @@
     </div>
     
     <div class="col-sm-4 form-inline">
-        <button id="@speakButton" class="btn" title="Play" data-toggle="popover" data-trigger="hover" data-content="Click hear to play"><img class="icon" src="@Url.Content("~/Content/out-play.png")" /></button>
-        <button id="@resumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click hear to resume" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-play.png")" /></button>
-        <button id="@pauseButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click hear to pause" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-pause.png")"></button>
-        <button id="@cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-stop.png")"></button>
+        <button id="@speakButton" class="btn" title="Listening" data-toggle="popover" data-trigger="hover" data-content="Click to listen your text"><img class="icon" src="@Url.Content("~/Content/out-play.png")" /></button>
+        <button id="@resumeButton" class="btn" title="Resume" data-toggle="popover" data-trigger="hover" data-content="Click to Resume" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-play.png")" /></button>
+        <button id="@pauseButton" class="btn" title="Pause" data-toggle="popover" data-trigger="hover" data-content="Click to Pause" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-pause.png")"></button>
+        <button id="@cancelButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click to Stop" style="display:none"><img class="icon" src="@Url.Content("~/Content/out-stop.png")"></button>
     </div>
 
     <div class="col-sm-5 form-inline">
         <button id="btn_record" class="btn" onclick="startButton(event)">
             <img alt="Start" id="img_record" class="icon img-circle" src="@Url.Content("~/Content/mic-record.gif")">
         </button>
-        <button id="@playButton" class="btn" title="Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to begin recording" style="display:none"><img class="icon" src="~/Content/rec-play.png"></button>
-        <button id="@stopButton" class="btn" title="Stop Recording" data-toggle="popover" data-trigger="hover" data-content="Click hear to stop recording" style="display:none"><img class="icon" src="~/Content/out-stop.png"></button>
-        <button id="@saveButton" class="btn" title="Downloading" data-toggle="popover" data-trigger="hover" data-content="Click hear to downloading" style="display:none"><img class="icon" src="~/Content/rec-download.png"></button>
+        <button id="@playButton" class="btn" title="Replay" data-toggle="popover" data-trigger="hover" data-content="Click to replay your voice" style="display:none"><img class="icon" src="~/Content/rec-play.png"></button>
+        <button id="@stopButton" class="btn" title="Stop" data-toggle="popover" data-trigger="hover" data-content="Click to Stop" style="display:none"><img class="icon" src="~/Content/out-stop.png"></button>
+        <button id="@saveButton" class="btn" title="Download" data-toggle="popover" data-trigger="hover" data-content="Click to Download" style="display:none"><img class="icon" src="~/Content/rec-download.png"></button>
 
     </div>
 </div>
@@ -74,6 +74,9 @@
     }
     span.underline {
         text-decoration: underline;
+    }
+    span.overline {
+        border-top: dashed 1px;
     }
     span.word {
         cursor: pointer;
@@ -312,7 +315,7 @@
             placement: "bottom"
         });
 
-        $(this).popover('show');
+        $(this).popover('show').addClass('overline');
 
         utterThis = new SpeechSynthesisUtterance(findWord);
         utterThis.voice = listVoices[$(@speechVoices).val()];
